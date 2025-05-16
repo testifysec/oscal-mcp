@@ -1,0 +1,35 @@
+{
+  "profile": {
+    "uuid": "f39e6a1e-b7e9-4fca-aaa8-b6f7c5f3e859",
+    "metadata": {
+      "title": "FedRAMP Moderate Baseline (Sample)",
+      "last-modified": "2025-05-16T18:32:50.243Z",
+      "version": "1.0",
+      "oscal-version": "1.1.0"
+    },
+    "imports": [
+      {
+        "href": "../../../catalogs/nist.gov/SP800-53/catalog.json",
+        "include-controls": [
+          {
+            "with-ids": [
+              "ac-1",
+              "ac-2",
+              "si-4"
+            ]
+          }
+        ]
+      }
+    ],
+    "modify": {
+      "set-parameters": [
+        {
+          "param-id": "ac-1_prm_1",
+          "values": [
+            "organization-defined personnel or roles"
+          ]
+        }
+      ]
+    }
+  }
+}
