@@ -12,8 +12,8 @@ oscal-content/
   │           └── catalog.json   # Official NIST 800-53 controls in OSCAL format
   │
   ├── profiles/                  # Standard profiles (baselines)
-  │   └── fedramp/               # FedRAMP profiles
-  │       └── fedramp_moderate.json  # FedRAMP Moderate baseline
+  │   └── baselines/             # Security impact baselines
+  │       └── moderate_baseline.json  # Moderate impact baseline
   │
   ├── extensions/                # Custom extensions organized by framework
   │   └── nist-800-53/           # Extensions specific to NIST 800-53

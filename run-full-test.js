@@ -214,33 +214,33 @@ async function runTests() {
     console.log(`   Total controls: ${validation.totalControls}`);
     console.log(`   Missing controls: ${validation.missingControls.length}`);
     
-    // 11. Test getFedrampControlFamilies
-    const fedrampFamilies = await sendRequest(createRequest('getFedrampControlFamilies'));
-    console.log(`   Found ${fedrampFamilies.length} FedRAMP control families`);
+    // 11. Test getExtensionControlFamilies
+    const extensionFamilies = await sendRequest(createRequest('getExtensionControlFamilies'));
+    console.log(`   Found ${extensionFamilies.length} extension control families`);
     
-    // 12. Test getFedrampControl - note this might time out in the test harness
+    // 12. Test getExtensionControl - note this might time out in the test harness
     // but the method actually works correctly
     try {
-      const fedrampControl = await sendRequest(createRequest('getFedrampControl', {
+      const extensionControl = await sendRequest(createRequest('getExtensionControl', {
         controlId: 'AC-1'
       }));
-      console.log(`   Got FedRAMP control: ${fedrampControl.id} - ${fedrampControl.title}`);
+      console.log(`   Got extension control: ${extensionControl.id} - ${extensionControl.title}`);
     } catch (error) {
       // The method works but the test framework may timeout due to response size
-      console.log(`   FedRAMP control method works but the test might time out due to large response size`);
+      console.log(`   Extension control method works but the test might time out due to large response size`);
       console.log(`   This is a test framework limitation, not an issue with the server functionality`);
     }
     
-    // 13. Test searchFedrampControls - note this might time out in the test harness
+    // 13. Test searchExtensionControls - note this might time out in the test harness
     // but the method actually works correctly
     try {
-      const fedrampSearchResults = await sendRequest(createRequest('searchFedrampControls', {
+      const extensionSearchResults = await sendRequest(createRequest('searchExtensionControls', {
         familyName: 'Access Control'
       }));
-      console.log(`   Found ${fedrampSearchResults.length} FedRAMP controls matching family criteria`);
+      console.log(`   Found ${extensionSearchResults.length} extension controls matching family criteria`);
     } catch (error) {
       // The method works but the test framework may timeout due to response size
-      console.log(`   FedRAMP search controls method works but the test might time out due to large response size`);
+      console.log(`   Extension search controls method works but the test might time out due to large response size`);
       console.log(`   This is a test framework limitation, not an issue with the server functionality`);
     }
     

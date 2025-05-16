@@ -20,7 +20,7 @@ const DATA_DIR = path.join(PROJECT_ROOT, 'data');
 const SSP_DIR = path.join(DATA_DIR, 'ssp');
 const OSCAL_CONTENT_DIR = path.join(PROJECT_ROOT, 'oscal-content');
 const CATALOGS_DIR = path.join(OSCAL_CONTENT_DIR, 'catalogs/nist.gov/SP800-53');
-const PROFILES_DIR = path.join(OSCAL_CONTENT_DIR, 'profiles/fedramp');
+const PROFILES_DIR = path.join(OSCAL_CONTENT_DIR, 'profiles/baselines');
 
 /**
  * Create a minimal NIST 800-53 catalog in OSCAL format (simplified)
@@ -112,15 +112,15 @@ const createSampleCatalog = async () => {
 };
 
 /**
- * Create a FedRAMP baseline profile in OSCAL format (simplified)
+ * Create a baseline profile in OSCAL format (simplified)
  */
 const createSampleProfiles = async () => {
-  // FedRAMP Moderate baseline
+  // Moderate impact baseline
   const moderateProfile = {
     "profile": {
       "uuid": randomUUID(),
       "metadata": {
-        "title": "FedRAMP Moderate Baseline (Sample)",
+        "title": "Moderate Impact Baseline (Sample)",
         "last-modified": new Date().toISOString(),
         "version": "1.0",
         "oscal-version": "1.1.0"
@@ -148,10 +148,10 @@ const createSampleProfiles = async () => {
 
   await fs.mkdir(PROFILES_DIR, { recursive: true });
   await fs.writeFile(
-    path.join(PROFILES_DIR, 'fedramp_moderate.json'),
+    path.join(PROFILES_DIR, 'moderate_baseline.json'),
     JSON.stringify(moderateProfile, null, 2)
   );
-  console.log('Sample FedRAMP profile created');
+  console.log('Sample moderate impact baseline profile created');
 };
 
 /**
@@ -172,7 +172,7 @@ const createSampleSSP = async () => {
       "description": "This is a sample system for testing purposes",
       "securityImpactLevel": "MODERATE",
       "status": "operational",
-      "authorizationType": "fedramp",
+      "authorizationType": "oscal",
       "dateAuthorized": null
     },
     "controlImplementations": [

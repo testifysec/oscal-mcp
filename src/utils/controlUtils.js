@@ -47,15 +47,36 @@ export function parse(controlId) {
   const upperControlId = controlId.toUpperCase();
   
   // Regular expressions for different formats
-  const dotNotationRegex = /^([A-Z]{2})\.([0-9]+)(?:\.([0-9]+))?$/;
-  const hyphenParensRegex = /^([A-Z]{2})-([0-9]+)(?:\(([0-9]+)\))?$/;
-  const hyphenRegex = /^([A-Z]{2})-([0-9]+)$/;
-  const spaceRegex = /^([A-Z]{2})\s+([0-9]+)$/;
-  const noSepRegex = /^([A-Z]{2})([0-9]+)$/;
+  const dotNotationRegex = /^([A-Z]{2})\.([0-9]+)(?:\.([0-9]+))?$/i;
+  const hyphenParensRegex = /^([A-Z]{2})-([0-9]+)(?:\(([0-9]+)\))?$/i;
+  const hyphenRegex = /^([A-Z]{2})-([0-9]+)$/i;
+  const spaceRegex = /^([A-Z]{2})\s+([0-9]+)$/i;
+  const noSepRegex = /^([A-Z]{2})([0-9]+)$/i;
   
   let family, number, enhancement;
   
-  // Try each format
+  // Special handling for FedRAMP format IDs
+  if (upperControlId.includes('-') && upperControlId.includes('.')) {
+    // Handle the FedRAMP format (e.g., "at-2.2")
+    const parts = upperControlId.split('-');
+    if (parts.length === 2) {
+      const family = parts[0];
+      const rest = parts[1];
+      const subParts = rest.split('.');
+      if (subParts.length === 2) {
+        return {
+          family: family.toUpperCase(),
+          number: parseInt(subParts[0], 10),
+          enhancement: parseInt(subParts[1], 10),
+          internal: `${family.toUpperCase()}.${subParts[0]}.${subParts[1]}`,
+          mcp: `${family.toUpperCase()}-${subParts[0]}(${subParts[1]})`,
+          display: `${family.toUpperCase()}-${subParts[0]}(${subParts[1]})`
+        };
+      }
+    }
+  }
+
+  // Try each standard format
   let matches = upperControlId.match(dotNotationRegex);
   if (matches) {
     family = matches[1];

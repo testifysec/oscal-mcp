@@ -1,9 +1,9 @@
 {
   "catalog": {
-    "uuid": "8fd8663a-a90f-4490-b01c-81d8680a1906",
+    "uuid": "2ab6a7bf-c574-4cad-9fed-c843d97f35b4",
     "metadata": {
       "title": "NIST SP 800-53 Revision 5 Security Controls (Sample)",
-      "last-modified": "2025-05-16T18:32:50.242Z",
+      "last-modified": "2025-05-16T19:50:54.032Z",
       "version": "5.0",
       "oscal-version": "1.1.0"
     },

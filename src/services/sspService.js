@@ -80,7 +80,7 @@ export const sspService = {
           description,
           securityImpactLevel: securityLevel,
           status: 'operational',
-          authorizationType: 'fedramp',
+          authorizationType: 'oscal',
           dateAuthorized: null,
         },
         controlImplementations: [],
@@ -89,7 +89,23 @@ export const sspService = {
       };
       
       // Get baseline controls for the security level
-      const baselineControls = await oscalService.getBaselineControls(securityLevel);
+      // If the user specified a profile type, use it, otherwise default to trying FedRAMP first
+      let baselineControls;
+      let profileType = 'fedramp'; // Default to FedRAMP
+      
+      try {
+        // First try with FedRAMP
+        baselineControls = await oscalService.getBaselineControls(securityLevel, profileType);
+      } catch (fedrampError) {
+        console.log(`Could not use FedRAMP profile: ${fedrampError.message}`);
+        
+        // Try with standard baseline as fallback
+        profileType = 'baseline';
+        baselineControls = await oscalService.getBaselineControls(securityLevel, profileType);
+      }
+      
+      // Store the profile type used for this SSP
+      ssp.systemCharacteristics.profileType = profileType || 'standard';
       
       // Initialize control implementations
       ssp.controlImplementations = baselineControls.map(controlId => {

@@ -1,6 +1,6 @@
 /**
- * FedRAMP Controls Service
- * Provides access to FedRAMP control information and implementation guidance
+ * Extension Controls Service
+ * Provides access to extended control implementation guidance for various frameworks
  */
 
 import fs from 'fs/promises';
@@ -17,31 +17,36 @@ console.log = function() {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, '../..');
-const CONTROLS_FILE_PATH = path.join(PROJECT_ROOT, 'oscal-content/extensions/nist-800-53/cloud-native/cloud-native-controls.json');
+
+// Default to NIST 800-53 cloud-native controls
+const DEFAULT_CONTROLS_PATH = path.join(PROJECT_ROOT, 'oscal-content/extensions/nist-800-53/cloud-native/cloud-native-controls.json');
 
 // Simple in-memory cache
-let controlsCache = null;
+const controlsCache = {};
 
 /**
- * Reads and parses the cloud-native controls file
+ * Reads and parses the extension controls file
+ * 
+ * @param {string} [controlsPath] - Optional path to specific controls file
+ * @returns {Promise<Object>} - The loaded controls data
  */
-export async function loadFedRampControls() {
+export async function loadControls(controlsPath = DEFAULT_CONTROLS_PATH) {
   // Check cache first
-  if (controlsCache) {
-    console.log('Using cached FedRAMP controls data');
-    return controlsCache;
+  if (controlsCache[controlsPath]) {
+    console.log(`Using cached controls data for ${controlsPath}`);
+    return controlsCache[controlsPath];
   }
   
   try {
-    console.log(`Loading cloud-native controls from: ${CONTROLS_FILE_PATH}`);
+    console.log(`Loading extension controls from: ${controlsPath}`);
     
     // Read the JSON file
-    const fileContent = await fs.readFile(CONTROLS_FILE_PATH, 'utf8');
+    const fileContent = await fs.readFile(controlsPath, 'utf8');
     
     // Parse JSON data
     const controlData = JSON.parse(fileContent);
     
-    console.log(`Successfully loaded cloud-native controls data`);
+    console.log(`Successfully loaded extension controls data`);
     if (controlData.control_families && controlData.control_families.length) {
       console.log(`Loaded ${controlData.control_families.length} control families`);
     }
@@ -50,11 +55,11 @@ export async function loadFedRampControls() {
     }
     
     // Cache the data
-    controlsCache = controlData;
+    controlsCache[controlsPath] = controlData;
     return controlData;
   } catch (error) {
-    console.error('Failed to load FedRAMP controls:', error);
-    throw new Error(`Failed to load FedRAMP controls data: ${error.message}`);
+    console.error('Failed to load extension controls:', error);
+    throw new Error(`Failed to load extension controls data: ${error.message}`);
   }
 }
 
@@ -62,10 +67,11 @@ export async function loadFedRampControls() {
  * Gets a specific control by ID
  * 
  * @param {string} controlId - The control ID to look for
+ * @param {string} [controlsPath] - Optional path to specific controls file
  * @returns {Object|null} - The control object or null if not found
  */
-export async function getControlById(controlId) {
-  const controlData = await loadFedRampControls();
+export async function getControlById(controlId, controlsPath) {
+  const controlData = await loadControls(controlsPath);
   
   // Normalize input ID (uppercase with no spaces)
   const normalizedInputId = controlId.toUpperCase().replace(/\\s+/g, '');
@@ -101,10 +107,11 @@ export async function getControlById(controlId) {
 /**
  * Lists all control families
  * 
+ * @param {string} [controlsPath] - Optional path to specific controls file
  * @returns {string[]} - Array of family names
  */
-export async function listControlFamilies() {
-  const controlData = await loadFedRampControls();
+export async function listControlFamilies(controlsPath) {
+  const controlData = await loadControls(controlsPath);
   
   if (controlData.control_families) {
     return controlData.control_families.map(family => family.name);
@@ -126,10 +133,11 @@ export async function listControlFamilies() {
  * Gets all controls for a specific family
  * 
  * @param {string} familyName - The family name to search for
+ * @param {string} [controlsPath] - Optional path to specific controls file
  * @returns {Object[]} - Array of controls in the family
  */
-export async function getControlsByFamily(familyName) {
-  const controlData = await loadFedRampControls();
+export async function getControlsByFamily(familyName, controlsPath) {
+  const controlData = await loadControls(controlsPath);
   
   // Find the family by name (case-insensitive partial match)
   const normalizedFamilyName = familyName.toLowerCase();
@@ -165,10 +173,11 @@ export async function getControlsByFamily(familyName) {
  * @param {string} [criteria.id] - Control ID to search for
  * @param {string} [criteria.familyName] - Family name to filter by
  * @param {string} [criteria.keywords] - Keywords to search in title and description
+ * @param {string} [controlsPath] - Optional path to specific controls file
  * @returns {Object[]} - Array of matching controls
  */
-export async function searchControls(criteria) {
-  const controlData = await loadFedRampControls();
+export async function searchControls(criteria, controlsPath) {
+  const controlData = await loadControls(controlsPath);
   const results = [];
   
   if (controlData.control_families) {
@@ -238,7 +247,7 @@ export async function searchControls(criteria) {
 }
 
 
-// Initialize the module by pre-loading the controls data
-loadFedRampControls().catch(error => {
-  console.error('Error initializing FedRAMP controls service:', error);
+// Initialize the module by pre-loading the default controls data
+loadControls().catch(error => {
+  console.error('Error initializing extension controls service:', error);
 });

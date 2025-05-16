@@ -5,9 +5,10 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { oscalService } from './oscalService.js';
 import { sspService } from './sspService.js';
-import * as fedrampControlsService from './fedrampControlsService.js';
+import * as extensionControlsService from './extensionControlsService.js';
 
 // Simple implementation of MCP server for testing
 const createStdioServer = (options) => {
@@ -127,10 +128,10 @@ export function setupMcpServer() {
   // Validation-related methods
   server.addMethod('validateSSP', validateSSP);
   
-  // FedRAMP control-related methods
-  server.addMethod('getFedrampControl', getFedrampControl);
-  server.addMethod('searchFedrampControls', searchFedrampControls);
-  server.addMethod('getFedrampControlFamilies', getFedrampControlFamilies);
+  // Extension control-related methods
+  server.addMethod('getExtensionControl', getExtensionControl);
+  server.addMethod('searchExtensionControls', searchExtensionControls);
+  server.addMethod('getExtensionControlFamilies', getExtensionControlFamilies);
 
   // Start server
   server.start();
@@ -266,42 +267,66 @@ async function validateSSP({ sspId }) {
 }
 
 /**
- * Get FedRAMP control by ID
+ * Get extension control by ID
  */
-async function getFedrampControl({ controlId }) {
+async function getExtensionControl({ controlId, framework }) {
   try {
-    const control = await fedrampControlsService.getControlById(controlId);
+    // If a specific framework is provided, construct the path to that framework's controls
+    let controlsPath;
+    if (framework) {
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      const PROJECT_ROOT = path.resolve(__dirname, '../..');
+      controlsPath = path.join(PROJECT_ROOT, `oscal-content/extensions/${framework}/cloud-native/cloud-native-controls.json`);
+    }
+    
+    const control = await extensionControlsService.getControlById(controlId, controlsPath);
     if (!control) {
       throw new Error(`Control not found: ${controlId}`);
     }
     return control;
   } catch (error) {
-    throw new Error(`Failed to get FedRAMP control: ${error.message}`);
+    throw new Error(`Failed to get extension control: ${error.message}`);
   }
 }
 
 /**
- * Search FedRAMP controls
+ * Search extension controls
  */
-async function searchFedrampControls({ id, familyName, keywords }) {
+async function searchExtensionControls({ id, familyName, keywords, framework }) {
   try {
+    // If a specific framework is provided, construct the path to that framework's controls
+    let controlsPath;
+    if (framework) {
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      const PROJECT_ROOT = path.resolve(__dirname, '../..');
+      controlsPath = path.join(PROJECT_ROOT, `oscal-content/extensions/${framework}/cloud-native/cloud-native-controls.json`);
+    }
+    
     const criteria = { id, familyName, keywords };
-    const controls = await fedrampControlsService.searchControls(criteria);
+    const controls = await extensionControlsService.searchControls(criteria, controlsPath);
     return controls;
   } catch (error) {
-    throw new Error(`Failed to search FedRAMP controls: ${error.message}`);
+    throw new Error(`Failed to search extension controls: ${error.message}`);
   }
 }
 
 /**
- * Get FedRAMP control families
+ * Get extension control families
  */
-async function getFedrampControlFamilies() {
+async function getExtensionControlFamilies({ framework }) {
   try {
-    const families = await fedrampControlsService.listControlFamilies();
+    // If a specific framework is provided, construct the path to that framework's controls
+    let controlsPath;
+    if (framework) {
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      const PROJECT_ROOT = path.resolve(__dirname, '../..');
+      controlsPath = path.join(PROJECT_ROOT, `oscal-content/extensions/${framework}/cloud-native/cloud-native-controls.json`);
+    }
+    
+    const families = await extensionControlsService.listControlFamilies(controlsPath);
     return families;
   } catch (error) {
-    throw new Error(`Failed to get FedRAMP control families: ${error.message}`);
+    throw new Error(`Failed to get extension control families: ${error.message}`);
   }
 }
 
