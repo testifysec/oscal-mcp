@@ -1,35 +1,21 @@
 {
   "profile": {
-    "uuid": "99c55b6e-8a54-4b0d-8cb3-d34f0080e1c5",
-    "metadata": {
-      "title": "Moderate Impact Baseline (Sample)",
-      "last-modified": "2025-05-16T19:50:54.033Z",
-      "version": "1.0",
-      "oscal-version": "1.1.0"
-    },
     "imports": [
       {
-        "href": "../../../catalogs/nist.gov/SP800-53/catalog.json",
         "include-controls": [
           {
             "with-ids": [
-              "ac-1",
-              "ac-2",
-              "si-4"
+              "AC-1",
+              "AC-2",
+              "AT-1"
             ]
           }
         ]
       }
     ],
-    "modify": {
-      "set-parameters": [
-        {
-          "param-id": "ac-1_prm_1",
-          "values": [
-            "organization-defined personnel or roles"
-          ]
-        }
-      ]
-    }
+    "metadata": {
+      "title": "Moderate Baseline Profile"
+    },
+    "uuid": "moderate_baseline"
   }
 }
